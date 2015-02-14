@@ -13,14 +13,13 @@
 
         //Load custom settings set below
         bot.retrieveSettings();
-
-        // Auto Roulette
+        
         setInterval(function () {
             if(autoRoulette === true) {
                 API.sendChat("!roulette");
             }
         }, 1000 * 60 * 90);
-
+        
         API.on(API.ADVANCE, function () {
             var toggle = $(".cycle-toggle");
             if(API.getWaitList().length > 16) {
@@ -52,6 +51,13 @@
                     }
                 }
             }, 2000);
+        });
+    
+        API.on(API.VOTE_UPDATE, function () {
+            if(basicBot.settings.mehSkip && API.getScore().negative >= basicBot.settings.mehSkipLimit) {
+            	API.sendChat("/me @" + API.getDJ().username + " your song received too many skips!");
+            	return API.moderateForceSkip();
+            }
         });
 
         /*
@@ -85,21 +91,7 @@
                 }
             }
         };
-
-        //Display Blacklisted
-        bot.commands.displayBlacklisted = {
-            command: ['displaybl', 'dbl'],
-            rank: 'user', //Feel free to change this if you want, I suggest only managers be able to use this
-            type: 'exact',
-            functionality: function (chat, cmd) {
-                if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
-                if (!bot.commands.executable(this.rank, chat)) return void (0);
-                else {
-                    bot.logNewBlacklistedSongs();
-                }
-            }
-        };
-
+        
         bot.commands.automateRoulette = {
             command: ['aroulette', 'autoroulette'],
             rank: 'manager',
@@ -138,7 +130,10 @@
     localStorage.setItem("basicBotsettings", JSON.stringify({
         botName: "Night-botX",
         language: "english",
-        chatLink: "https://rawgit.com/BrabbitX/basicBot/master/lang/en.json",
+        chatLink: "https://rawgit.com/Yemasthui/basicBot/master/lang/en.json",
+        startupCap: 1, // 1-200
+        startupVolume: 0, // 0-100
+        startupEmoji: false, // true or false
         maximumAfk: 240,
         afkRemoval: false,
         maximumDc: 20,
@@ -148,6 +143,8 @@
         maximumLocktime: 10,
         cycleGuard: false,
         maximumCycletime: 10,
+        voteSkip: false,
+        voteSkipLimit: 10,
         timeGuard: true,
         maximumSongLength: 5.15,
         autodisable: false,
@@ -173,7 +170,7 @@
         etaRestriction: true,
         welcome: false,
         mehSkip: true,
-        mehSkipLimit: 10,
+        mehSkipLimit: 7,
         opLink: null,
         rulesLink: null,
         themeLink: null,
@@ -181,7 +178,7 @@
         youtubeLink: null,
         website: "http://nightcorefc.com",
         intervalMessages: [],
-        messageInterval: 6,
+        messageInterval: 5,
         songstats: false,
         commandLiteral: "!",
         blacklists: {
@@ -191,6 +188,6 @@
     }));
 
     //Start the bot and extend it when it has loaded.
-    $.getScript('https://rawgit.com/BrabbitX/basicBot/master/basicBot.js', extend);
+    $.getScript('https://rawgit.com/Yemasthui/basicBot/master/basicBot.js', extend);
 
 }).call(this);
